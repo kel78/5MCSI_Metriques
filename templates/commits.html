@@ -1,8 +1,7 @@
-<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Commits par minute</title>
+    <title>Commits</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -41,62 +40,42 @@
     <script>
         $(document).ready(function() {
             const baseUrl = 'https://api.github.com/repos/kel78/5MCSI_Metriques/commits';
-            let commitsPerMinute = {};
-            let minDate, maxDate;
+            let commitCountPerMinute = {};
 
             $.getJSON(baseUrl, function(data) {
-                data.forEach(function(commit, index) {
-                    const fullDate = commit.commit.author.date;
-                    const date = fullDate.split('T')[0];
-                    const minute = fullDate.split('T')[1].substring(0, 5);
-                    const minuteKey = date + ' ' + minute;
+                data.forEach(function(commit) {
+                    const fullDate = commit.commit.author.date; // "2023-04-05T14:30:00Z"
+                    const date = fullDate.split('T')[0]; // Date sans l'heure
+                    const time = fullDate.split('T')[1].substring(0, 5); // Heure et minute
+                    const minuteKey = date + ' ' + time; // Clé unique par minute
 
-                    // Initialiser minDate et maxDate avec la première date trouvée
-                    if(index === 0) {
-                        minDate = maxDate = new Date(fullDate);
+                    // Incrémenter le compteur pour chaque minute
+                    if (!commitCountPerMinute[minuteKey]) {
+                        commitCountPerMinute[minuteKey] = 1;
                     } else {
-                        let currentDate = new Date(fullDate);
-                        if(currentDate < minDate) minDate = currentDate;
-                        if(currentDate > maxDate) maxDate = currentDate;
+                        commitCountPerMinute[minuteKey]++;
                     }
 
-                    // Compter les commits par minute
-                    if (!commitsPerMinute[minuteKey]) {
-                        commitsPerMinute[minuteKey] = 1;
-                    } else {
-                        commitsPerMinute[minuteKey]++;
-                    }
-                    
                     // Afficher chaque commit dans le tableau HTML
                     $('#commit-table tbody').append(`
                         <tr>
                             <td>${date}</td>
-                            <td>${minute}</td>
+                            <td>${time}</td>
                         </tr>
                     `);
                 });
 
-                // Générer les labels de l'axe des abscisses (chaque minute entre minDate et maxDate)
-                let labels = [];
-                let currentDate = new Date(minDate.getTime());
-
-                while(currentDate <= maxDate) {
-                    let label = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')} ${String(currentDate.getHours()).padStart(2, '0')}:${String(currentDate.getMinutes()).padStart(2, '0')}`;
-                    labels.push(label);
-                    currentDate.setMinutes(currentDate.getMinutes() + 1);
-                }
-
-                // Ajuster les données du graphique
-                const dataPoints = labels.map(label => commitsPerMinute[label] || 0);
+                const sortedMinutes = Object.keys(commitCountPerMinute).sort();
+                const commitCounts = sortedMinutes.map(minute => commitCountPerMinute[minute]);
 
                 const ctx = document.getElementById('commitsChart').getContext('2d');
                 const commitsChart = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: labels,
+                        labels: sortedMinutes, // Minutes uniques en tant que labels
                         datasets: [{
                             label: 'Commits par minute',
-                            data: dataPoints,
+                            data: commitCounts, // Nombre de commits par minute
                             backgroundColor: 'rgba(255, 99, 132, 0.2)',
                             borderColor: 'rgba(255, 99, 132, 1)',
                             borderWidth: 1
@@ -104,22 +83,8 @@
                     },
                     options: {
                         scales: {
-                            x: {
-                                type: 'time',
-                                time: {
-                                    unit: 'minute',
-                                    tooltipFormat: 'yyyy-MM-dd HH:mm'
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Time'
-                                }
-                            },
                             y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
+                                beginAtZero: true
                             }
                         }
                     }
