@@ -2,55 +2,53 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Commits</title>
+    <title>Commits Graphique</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
+        /* Vos styles CSS */
     </style>
 </head>
 <body>
     <h1>Informations sur les commits</h1>
-    <table id="commit-table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Minute</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Les lignes seront ajoutées ici par jQuery -->
-        </tbody>
-    </table>
+    <!-- Tableau existant -->
+    <canvas id="commitsChart"></canvas>
 
     <script>
         $(document).ready(function() {
             const baseUrl = 'https://api.github.com/repos/kel78/5MCSI_Metriques/commits';
+            let commitDates = {};
+
             $.getJSON(baseUrl, function(data) {
                 data.forEach(function(commit) {
-                    const date = commit.commit.author.date;
-                    const minutesUrl = `/extract-minutes/${date}`;
-                    $.getJSON(minutesUrl, function(minutesData) {
-                        $('#commit-table tbody').append(`
-                            <tr>
-                                <td>${date}</td>
-                                <td>${minutesData.minutes}</td>
-                            </tr>
-                        `);
-                    });
+                    const date = commit.commit.author.date.split('T')[0]; // Extrait seulement la date sans l'heure
+                    if (commitDates[date]) {
+                        commitDates[date] += 1;
+                    } else {
+                        commitDates[date] = 1;
+                    }
+                });
+
+                const ctx = document.getElementById('commitsChart').getContext('2d');
+                const commitsChart = new Chart(ctx, {
+                    type: 'line', // Ou un autre type de graphique selon vos besoins
+                    data: {
+                        labels: Object.keys(commitDates), // Les dates
+                        datasets: [{
+                            label: 'Nombre de commits par date',
+                            data: Object.values(commitDates), // Le nombre de commits
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
                 });
             });
         });
