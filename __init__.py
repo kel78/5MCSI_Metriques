@@ -3,21 +3,7 @@ from flask import render_template
 from flask import json
 from datetime import datetime
 from urllib.request import urlopen
-import matplotlib.pyplot as plt
 import sqlite3
-
-
-# Obtention des données des commits
-url = "https://api.github.com/repos/kel78/5MCSI_Metriques/commits"
-response = requests.get(url)
-commits = response.json()
-
-# Extraction des minutes des commits
-commit_dates = [commit['commit']['author']['date'] for commit in commits]
-commit_minutes = [datetime.strptime(date, '%Y-%m-%dT%H:%M:%SZ').minute for date in commit_dates]
-
-# Comptage des commits par minute
-commits_per_minute = Counter(commit_minutes)
                                                                                                                                        
 app = Flask(__name__)                                                                                                                  
                                                                                                                                        
@@ -48,25 +34,6 @@ def mongraphique():
 @app.route("/histogramme/")
 def mongraphique2():
     return render_template("histogramme.html")
-
-@app.route('/commits/')
-def show_commits():
-    # Création du graphique
-    minutes = list(commits_per_minute.keys())
-    counts = list(commits_per_minute.values())
-    
-    plt.figure(figsize=(10, 6))  # Ajuste la taille du graphique si nécessaire
-    plt.bar(minutes, counts, color='skyblue')
-    plt.xlabel('Minutes')
-    plt.ylabel('Number of Commits')
-    plt.title('Commits per Minute')
-    
-    # Envoi du graphique comme réponse
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight')
-    buf.seek(0)
-    plt.close()  # Ferme la figure pour libérer la mémoire
-    return send_file(buf, mimetype='image/png')
 
 if __name__ == "__main__":
   app.run(debug=True)
