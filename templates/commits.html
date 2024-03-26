@@ -2,7 +2,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Commits</title>
-    <title>Commits Graphique</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -21,7 +20,6 @@
         th {
             background-color: #f2f2f2;
         }
-        /* Vos styles CSS */
     </style>
 </head>
 <body>
@@ -37,44 +35,49 @@
             <!-- Les lignes seront ajoutées ici par jQuery -->
         </tbody>
     </table>
-    <!-- Tableau existant -->
     <canvas id="commitsChart"></canvas>
 
     <script>
         $(document).ready(function() {
             const baseUrl = 'https://api.github.com/repos/kel78/5MCSI_Metriques/commits';
-            let commitDates = {};
+            let commitDetails = [];
 
             $.getJSON(baseUrl, function(data) {
                 data.forEach(function(commit) {
-                    const date = commit.commit.author.date;
-                    const minutesUrl = `/extract-minutes/${date}`;
-                    $.getJSON(minutesUrl, function(minutesData) {
-                        $('#commit-table tbody').append(`
-                            <tr>
-                                <td>${date}</td>
-                                <td>${minutesData.minutes}</td>
-                            </tr>
-                        `);
+                    const fullDate = commit.commit.author.date; // "2023-04-05T14:30:00Z"
+                    const date = fullDate.split('T')[0]; // Extrait seulement la date sans l'heure
+                    const time = fullDate.split('T')[1].substring(0, 5); // Extrait l'heure et la minute
+                    const dateTime = date + ' ' + time; // Combine la date et l'heure pour une clé unique
+                    
+                    // Ajouter les détails du commit au tableau
+                    commitDetails.push({
+                        dateTime: dateTime,
+                        date: date,
+                        time: time
                     });
-                    const date = commit.commit.author.date.split('T')[0]; // Extrait seulement la date sans l'heure
-                    if (commitDates[date]) {
-                        commitDates[date] += 1;
-                    } else {
-                        commitDates[date] = 1;
-                    }
+                    
+                    // Afficher chaque commit dans le tableau HTML
+                    $('#commit-table tbody').append(`
+                        <tr>
+                            <td>${date}</td>
+                            <td>${time}</td>
+                        </tr>
+                    `);
                 });
+
+                // Trier les détails des commits par dateTime
+                commitDetails.sort((a, b) => a.dateTime.localeCompare(b.dateTime));
 
                 const ctx = document.getElementById('commitsChart').getContext('2d');
                 const commitsChart = new Chart(ctx, {
-                    type: 'line', // Ou un autre type de graphique selon vos besoins
+                    type: 'line',
                     data: {
-                        labels: Object.keys(commitDates), // Les dates
+                        labels: commitDetails.map(detail => detail.dateTime), // Utiliser dateTime pour les labels
                         datasets: [{
-                            label: 'Nombre de commits par date',
-                            data: Object.values(commitDates), // Le nombre de commits
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
+                            label: 'Commits par minute',
+                            data: commitDetails.map((_, i) => i + 1), // Incrémenter pour chaque commit
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
                             borderWidth: 1
                         }]
                     },
@@ -88,3 +91,6 @@
                 });
             });
         });
+    </script>
+</body>
+</html>
