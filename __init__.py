@@ -35,6 +35,10 @@ def mongraphique():
 def mongraphique2():
     return render_template("histogramme.html")
 
+@app.route("/commits/")
+def commit():
+    return render_template("commits.html")
+
 if __name__ == "__main__":
   app.run(debug=True)
 
