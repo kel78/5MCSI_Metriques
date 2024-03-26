@@ -1,183 +1,80 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        body {
-          margin: 0;
-          padding: 0;
-          background-color: #000;
-          padding-bottom: 100px;
-        }
-
-        #contact {
-          width: 100%;
-          height: 100%;
-        }
-
-        .section-header {
-          text-align: center;
-          margin: 0 auto;
-          padding: 40px 0;
-          font: 300 60px 'Oswald', sans-serif;
-          color: #fff;
-          text-transform: uppercase;
-          letter-spacing: 6px;
-        }
-
-        .contact-wrapper {
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          margin: 0 auto;
-          padding: 20px;
-          position: relative;
-          max-width: 840px;
-        }
-
-        .form-horizontal {
-          max-width: 400px;
-          font-family: 'Lato';
-          font-weight: 400;
-        }
-
-        .form-control, 
-        textarea {
-          max-width: 400px;
-          background-color: #000;
-          color: #fff;
-          letter-spacing: 1px;
-        }
-
-        .send-button {
-          margin-top: 15px;
-          height: 34px;
-          width: 400px;
-          overflow: hidden;
-          transition: all .2s ease-in-out;
-        }
-
-        .alt-send-button {
-          width: 400px;
-          height: 34px;
-          transition: all .2s ease-in-out;
-        }
-
-        .send-text {
-          display: block;
-          margin-top: 10px;
-          font: 700 12px 'Lato', sans-serif;
-          letter-spacing: 2px;
-        }
-
-        .alt-send-button:hover {
-          transform: translate3d(0px, -29px, 0px);
-        }
-
-        .direct-contact-container {
-          max-width: 400px;
-        }
-
-        .contact-list {
-          list-style-type: none;
-          margin-left: -30px;
-          padding-right: 20px;
-        }
-
-        .list-item {
-          line-height: 4;
-          color: #aaa;
-        }
-
-        .contact-text {
-          font: 300 18px 'Lato', sans-serif;
-          letter-spacing: 1.9px;
-          color: #bbb;
-        }
-
-        .place, .phone, .gmail {
-          margin-left: 56px;
-        }
-
-        .contact-text a {
-          color: #bbb;
-          text-decoration: none;
-          transition-duration: 0.2s;
-        }
-
-        .contact-text a:hover {
-          color: #fff;
-          text-decoration: none;
-        }
-
-        .social-media-list {
-          position: relative;
-          font-size: 22px;
-          text-align: center;
-          width: 100%;
-          margin: 0 auto;
-          padding: 0;
-        }
-
-        .social-media-list li a {
-          color: #fff;
-        }
-
-        .social-media-list li {
-          position: relative; 
-          display: inline-block;
-          height: 60px;
-          width: 60px;
-          margin: 10px 3px;
-          line-height: 60px;
-          border-radius: 50%;
-          color: #fff;
-          background-color: rgb(27,27,27);
-          cursor: pointer; 
-          transition: all .2s ease-in-out;
-        }
-
-        .social-media-list li:hover {
-          background-color: #fff; 
-        }
-
-        .social-media-list li:hover a {
-          color: #000;
-        }
-
-        hr {
-          border-color: rgba(255,255,255,.6);
-        }
-
-        @media screen and (max-width: 850px) {
-          .contact-wrapper {
-            display: flex;
-            flex-direction: column;
-          }
-        }
-
-        @media screen and (max-width: 569px) {
-          .form-control, textarea {
-            margin: 0 auto;
-            width: 280px;
-          }
-
-          .direct-contact-container {
-            max-width: 280px;
-          }
-        }
-
-        @media screen and (max-width: 410px) {
-          .send-button {
-            width: 99%;
-          }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Formulaire de Contact</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+        color: #333;
+    }
+    .input-group {
+        margin-bottom: 15px;
+    }
+    .input-group label {
+        display: block;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    .input-group input, .input-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .input-group textarea {
+        resize: vertical;
+    }
+    button {
+        background-color: #5cb85c;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #4cae4c;
+    }
+</style>
 </head>
 <body>
 
-<section id="contact">
-    <h1 class="section-header">Contact</h
+<form action="votre_script_de_traitement.php" method="post">
+    <h2>Contactez-nous</h2>
+    <div class="input-group">
+        <label for="name">Nom :</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    <div class="input-group">
+        <label for="email">Email :</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+    <div class="input-group">
+        <label for="subject">Sujet :</label>
+        <input type="text" id="subject" name="subject" required>
+    </div>
+    <div class="input-group">
+        <label for="message">Message :</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+    </div>
+    <button type="submit">Envoyer</button>
+</form>
+
+</body>
+</html>
